@@ -55,7 +55,7 @@ func (r *usersRepo) FindOneUser(username string) (*entities.UsersPassport, error
 	"id",
 	"username",
 	"password"
-	FROM "users"
+	FROM public.users
 	WHERE "username" = $1;
 	`
 

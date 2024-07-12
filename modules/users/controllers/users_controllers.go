@@ -15,7 +15,7 @@ func NewUsersController(r fiber.Router, usersUse entities.UsersUsecase) {
 	controllers := &usersController{
 		UsersUse: usersUse,
 	}
-	r.Post("/", controllers.Register)
+	r.Post("/register", controllers.Register)
 }
 
 func (h *usersController) Register(c *fiber.Ctx) error {

@@ -4,7 +4,8 @@ go 1.20
 
 require (
 	github.com/gofiber/fiber/v2 v2.52.5
-	github.com/gookit/validate v1.5.2
+	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/google/uuid v1.5.0
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
@@ -13,10 +14,6 @@ require (
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
-	github.com/google/uuid v1.5.0 // indirect
-	github.com/gookit/filter v1.2.1 // indirect
-	github.com/gookit/goutil v0.6.15 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.14.3 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
