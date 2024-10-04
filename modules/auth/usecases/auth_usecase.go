@@ -23,6 +23,7 @@ func NewAuthUsecase(authRepo entities.AuthRepository, usersRepo entities.UsersRe
 
 func (u *authUse) Login(cfg *configs.Configs, req *entities.UsersCredentials) (*entities.UsersLoginRes, error) {
 	user, err := u.UsersRepo.FindOneUser(req.Username)
+
 	if err != nil {
 		return nil, err
 	}

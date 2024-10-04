@@ -1,41 +1,58 @@
 package middlewares
 
 import (
+	"clean-arc/configs"
 	"clean-arc/helpers"
-	"fmt"
+	"clean-arc/modules/entities"
+	"clean-arc/pkg/utils"
+	"context"
 	"log"
-	"os"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v4"
 )
 
-func JwtAuthentication() fiber.Handler {
+func JwtAuthentication(cfg *configs.Configs) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		ctx := context.WithValue(c.Context(), entities.MiddlewaresCon, time.Now().UnixMilli())
 		accessToken := strings.TrimPrefix(c.Get("Authorization"), "Bearer ")
+		log.Printf("called:\t%v", utils.Trace())
+		defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.MiddlewaresCon).(int64)))
 		if accessToken == "" {
 			log.Println("error: authorization is empty")
 			return helpers.RespondWithJSON(c, fiber.ErrUnauthorized.Message, fiber.ErrUnauthorized.Code, "authorization is empty", nil)
 		}
-		secretKey := os.Getenv("JWT_SECRET_KEY")
-		token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("error, unexpected signing method: %v", token.Header["alg"])
-			}
-			return []byte(secretKey), nil
-		})
+
+		userId, err := utils.JwtExtractPayload(ctx, cfg, "user_id", accessToken)
+
 		if err != nil {
-			log.Panicln(err.Error())
-			return helpers.RespondWithJSON(c, fiber.ErrUnauthorized.Message, fiber.ErrUnauthorized.Code, "error, unauthorized", nil)
+			return helpers.RespondWithJSON(c, fiber.ErrUnauthorized.Message, fiber.ErrUnauthorized.Code, err.Error(), nil)
 		}
-		if claim, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			c.Locals("user", claim)
-			c.Locals("user_id", claim["user_id"])
-			c.Locals("username", claim["username"])
-			return c.Next()
+
+		c.Locals("user_id", userId)
+		username, err := utils.JwtExtractPayload(ctx, cfg, "username", accessToken)
+
+		if err != nil {
+			return helpers.RespondWithJSON(c, fiber.ErrUnauthorized.Message, fiber.ErrUnauthorized.Code, err.Error(), nil)
 		}
-		return helpers.RespondWithJSON(c, fiber.ErrUnauthorized.Message, fiber.ErrUnauthorized.Code, "error, unauthorized", nil)
+		c.Locals("username", username)
+
+		userRole, err := utils.JwtExtractPayload(ctx, cfg, "role", accessToken)
+
+		if err != nil {
+			return helpers.RespondWithJSON(c, fiber.ErrUnauthorized.Message, fiber.ErrUnauthorized.Code, err.Error(), nil)
+		}
+		//Set role into Fiber cache in case to use with another function from next
+		log.Printf("userRole extracted from JWT: %s", userRole)
+		c.Locals("role", userRole)
+
+		paramsUserId := c.Params("user_id")
+		if paramsUserId != "" && paramsUserId != userId {
+			return helpers.RespondWithJSON(c, fiber.ErrUnauthorized.Message, fiber.ErrUnauthorized.Code, "error, have no permission to access", nil)
+		}
+
+		return c.Next()
 	}
 
 }

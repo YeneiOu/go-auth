@@ -8,6 +8,7 @@ import (
 
 	"clean-arc/modules/servers"
 	databases "clean-arc/pkg/databases"
+	redisclient "clean-arc/pkg/redis"
 
 	"github.com/joho/godotenv"
 )
@@ -19,6 +20,7 @@ func main() {
 	}
 	cfg := new(configs.Configs)
 
+	redisClient := redisclient.GetNewRedisClient()
 	// Fiber configs
 	cfg.App.Host = os.Getenv("FIBER_HOST")
 	cfg.App.Port = os.Getenv("FIBER_PORT")
@@ -38,6 +40,6 @@ func main() {
 	}
 	defer db.Close()
 
-	s := servers.NewServer(cfg, db)
+	s := servers.NewServer(cfg, db, redisClient)
 	s.Start()
 }

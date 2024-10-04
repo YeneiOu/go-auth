@@ -3,6 +3,7 @@ package servers
 import (
 	"clean-arc/configs"
 	"clean-arc/pkg/utils"
+	"github.com/redis/go-redis/v9"
 	"log"
 
 	"github.com/jmoiron/sqlx"
@@ -11,16 +12,18 @@ import (
 )
 
 type Server struct {
-	App *fiber.App
-	Cfg *configs.Configs
-	Db  *sqlx.DB
+	App         *fiber.App
+	Cfg         *configs.Configs
+	Db          *sqlx.DB
+	RedisClient *redis.Client
 }
 
-func NewServer(cfg *configs.Configs, db *sqlx.DB) *Server {
+func NewServer(cfg *configs.Configs, db *sqlx.DB, redisClient *redis.Client) *Server {
 	return &Server{
-		App: fiber.New(),
-		Cfg: cfg,
-		Db:  db,
+		App:         fiber.New(),
+		Cfg:         cfg,
+		Db:          db,
+		RedisClient: redisClient,
 	}
 }
 

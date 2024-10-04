@@ -1,7 +1,6 @@
 package databases
 
 import (
-	"fmt"
 	"log"
 
 	"clean-arc/configs"
@@ -18,7 +17,7 @@ func NewPostgreSQLDBConnection(cfg *configs.Configs) (*sqlx.DB, error) {
 	}
 
 	db, err := sqlx.Connect("pgx", postgresUrl)
-	fmt.Println(db)
+
 	if err != nil {
 		defer db.Close()
 		log.Printf("error, can't connect to database, %s", err.Error())
