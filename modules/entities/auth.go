@@ -2,7 +2,6 @@ package entities
 
 import (
 	"clean-arc/configs"
-
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -20,14 +19,16 @@ type UsersCredentials struct {
 }
 
 type UsersPassport struct {
-	Id       int    `json:"id" db:"id"`
+	ID       int64  `json:"id" db:"id"`
 	Username string `json:"username" db:"username"`
 	Password string `json:"password" db:"password"`
+	UserRole string `json:"role" db:"role" default:"user"`
 }
 
 type UsersClaims struct {
-	Id       int    `json:"user_id"`
+	ID       int64  `json:"user_id"`
 	Username string `json:"username"`
+	UserRole string `json:"role"`
 	jwt.RegisteredClaims
 }
 

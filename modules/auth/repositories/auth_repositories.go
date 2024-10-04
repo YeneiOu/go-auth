@@ -22,9 +22,11 @@ func NewAuthRepository(db *sqlx.DB) entities.AuthRepository {
 }
 
 func (r *authRepo) SignUsersAccessToken(req *entities.UsersPassport) (string, error) {
+
 	claims := entities.UsersClaims{
-		Id:       req.Id,
+		ID:       req.ID,
 		Username: req.Username,
+		UserRole: req.UserRole,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
